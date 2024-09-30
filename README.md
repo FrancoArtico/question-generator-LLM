@@ -1,5 +1,8 @@
 # Generación de preguntas de lectura comprensiva en español utilizando LLM
+
 *Franco Artico y Nain Cadro*
+
+
 *Universidad Nacional de Córdoba*
 
 La generación de preguntas es una tarea de procesamiento de lenguaje natural cuyo objetivo es producir preguntas válidas de acuerdo con un pasaje de texto dado y la respuesta a la cual aspiramos [1]. La utilidad de este tipo de tarea se ve reflejada en el ámbito educativo, dado que, en caso de aplicarse, los docentes podrían reducir la carga de trabajo y enfocar sus horas en otras tareas de aprendizaje. Mientras que los estudiantes pueden usarlo para autoevaluación o bien, para poner a prueba sus conocimientos en materiales de estudio que no tengan una guía práctica.
@@ -22,8 +25,8 @@ Además, las preguntas generadas tendrán una respuesta, que será la proporcion
 ### Técnicas a utilizar
 
 *Few shot prompting* es una técnica que consiste en dar al modelo varios ejemplos para mejorar su capacidad de respuesta en tareas específicas.  
-*Fine tuning* es el proceso de adaptar un modelo previamente entrenado para tareas o casos de uso específicos*.*  
-*spaCy vector similarity.*
+*Fine tuning* es el proceso de adaptar un modelo previamente entrenado para tareas o casos de uso específicos.  
+*spaCy vector similarity* para medir la similtud entre las respuestas deseadas y las generadas por el modelo.
 
 ### Evaluación
 
@@ -65,8 +68,8 @@ La evaluación será anecdótica manual y tendremos en cuenta el utilizar un con
 
 ### Referencias
 
-\[1\]  [Papers With Code: Question Generation](https://paperswithcode.com/task/question-generation).
-\[2\]  [Learning to Ask: Naural Question Generation for Reading Comprehension (Arxiv)](https://arxiv.org/pdf/1705.00106).
-\[3\]  [Prompt-Engineering and Transformer-based Question Generation and Evaluation (Arxiv)](https://arxiv.org/pdf/2310.18867).
-\[4 \][Meta AI: 5 Steps to Getting Started with Llama 2](https://ai.meta.com/blog/5-steps-to-getting-started-with-llama-2/).  
+\[1\] [Papers With Code: Question Generation](https://paperswithcode.com/task/question-generation).
+\[2\] [Learning to Ask: Naural Question Generation for Reading Comprehension (Arxiv)](https://arxiv.org/pdf/1705.00106).
+\[3\] [Prompt-Engineering and Transformer-based Question Generation and Evaluation (Arxiv)](https://arxiv.org/pdf/2310.18867).
+\[4\] [Meta AI: 5 Steps to Getting Started with Llama 2](https://ai.meta.com/blog/5-steps-to-getting-started-with-llama-2/).  
 \[5\] [huggingfaceLlama2](https://huggingface.co/docs/transformers/main/model_doc/llama2).
