@@ -38,9 +38,9 @@ La evaluación será anecdótica manual y tendremos en cuenta el utilizar un con
 
 * Determinar la versión del modelo del lenguaje a utilizar.  
 * Buscar y leer paper sobre generación de preguntas.  
-* Leer y aprender sobre las técnicas de *fine tuning* y *few shot promoting*.  
+* Leer y aprender sobre las técnicas de *fine tuning* y *few shot prompting*.
 * Determinar criterios de evaluación y métricas.  
-* Buscar datasets de preguntas en español.  
+* Buscar conjunto de datos de preguntas en español.  
 * Instalar y configurar el modelo determinado junto con las librerías.
 
 #### Estudiar el modelo (semana 2\)
@@ -64,12 +64,12 @@ La evaluación será anecdótica manual y tendremos en cuenta el utilizar un con
 #### Conclusiones (semana 5\)
 
 * Elaborar una conclusión donde se comparen los resultados y el costo de aplicar  cada una de las técnicas.  
-* Hacer correcciones finales sobre las netbook. 
+* Hacer correcciones finales sobre las netbooks.
 
 ### Referencias
 
-\[1\] [Papers With Code: Question Generation](https://paperswithcode.com/task/question-generation).
-\[2\] [Learning to Ask: Naural Question Generation for Reading Comprehension (Arxiv)](https://arxiv.org/pdf/1705.00106).
-\[3\] [Prompt-Engineering and Transformer-based Question Generation and Evaluation (Arxiv)](https://arxiv.org/pdf/2310.18867).
-\[4\] [Meta AI: 5 Steps to Getting Started with Llama 2](https://ai.meta.com/blog/5-steps-to-getting-started-with-llama-2/).  
-\[5\] [huggingfaceLlama2](https://huggingface.co/docs/transformers/main/model_doc/llama2).
+1. [Papers With Code: Question Generation](https://paperswithcode.com/task/question-generation).
+2. [Learning to Ask: Naural Question Generation for Reading Comprehension (Arxiv)](https://arxiv.org/pdf/1705.00106).
+3. [Prompt-Engineering and Transformer-based Question Generation and Evaluation (Arxiv)](https://arxiv.org/pdf/2310.18867).
+4. [Meta AI: 5 Steps to Getting Started with Llama 2](https://ai.meta.com/blog/5-steps-to-getting-started-with-llama-2/).  
+5. [huggingfaceLlama2](https://huggingface.co/docs/transformers/main/model_doc/llama2).
