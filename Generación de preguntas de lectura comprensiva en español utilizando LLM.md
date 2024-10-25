@@ -1,8 +1,3 @@
----
-title: Generación de preguntas de lectura comprensiva en español utilizando LLM
-
----
-
 # Generación de preguntas de lectura comprensiva en español utilizando LLM
 
 **Resumen:** El enfoque de este proyecto es realizar un generador de preguntas de lectura comprensiva de tipo "de respuesta corta" [1] y verdaderos o falsos, basado en el modelo extenso de lenguaje `"Llama-3.1-8B-Instruct"`, el cual trabajará sobre artículos de biografias presentes en Wikipedia. Su objetivo sería reducir la carga horaria de los profesores y servir de ayuda para el aprendizaje de nuevos textos.
@@ -38,7 +33,7 @@ prompt = article[0] + article[1] + "\n\n En base al texto anterior, responder la
 
 dónde `article[0]` y `article[1]` es el primer y segundo párrafo de un artículo de la Wikipedia sobre Gueorgui Vasílievich Chicherin [6].
 El modelo respondió a la entrada de la siguiente manera:
-```python
+```
 En base al texto anterior, responder las siguientes 5 preguntas: 
 ¿Qué año falleció Gueorgui Vasílievich Chicherin?
 ¿En qué país estaba cuando estalló la Primera Guerra Mundial?
