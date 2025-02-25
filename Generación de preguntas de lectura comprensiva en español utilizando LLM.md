@@ -1,176 +1,224 @@
 # Generación de preguntas de lectura comprensiva en español utilizando LLM
 
-**Resumen:** El enfoque de este proyecto es realizar un generador de preguntas de lectura comprensiva de tipo "de respuesta corta" [1] y verdaderos o falsos, basado en el modelo extenso de lenguaje `"Llama-3.1-8B-Instruct"`, el cual trabajará sobre artículos de biografias presentes en Wikipedia. Su objetivo sería reducir la carga horaria de los profesores y servir de ayuda para el aprendizaje de nuevos textos.
+#### Resumen
+Este proyecto presenta una prueba de concepto para un generador de preguntas de lectura comprensiva en español, que se enfocará principalmente en dos tipos de preguntas: de respuesta corta [1] y afirmaciones a evaluar como verdaderas o falsas. Para ello, utilizaremos el modelo de lenguaje `"Llama-3.1-8B-Instruct"` aplicando distintas técnicas y evaluando sus posibles mejorías en el desempeño. A lo largo de este proyecto trabajaremos principalmente sobre artículos de Wikipedia. Consideramos este estudio de interés dado a que la viabilidad de un sistema con estas características podría reducir la carga horaria de profesores y reforzar el aprendizaje de los estudiantes sobre los textos.
 
-**Autores:** *Franco Artico* y *Nain Cadro*
+**Autores:** *Franco Artico* y *Nain Cadro*.
 
-## Objetivos preliminares y revisión
+## Hipótesis, objetivos iniciales y el estado final alcanzado
+Las **hipótesis** sobre las cuales se desarrolló este proyecto son:
+* El modelo presenta fallas en la generación de preguntas en español, las cuales podrían ser errores sintácticos o preguntas desalineadas con los objetivos del proyecto.
+* La reducción del dominio del problema nos permitirá identificar más errores y mejorar la calidad de las preguntas generadas.
 
-Los objetivos preliminares planteados en el informe preliminar fueron:
-1. Detectar limitaciones de LLaMa2 para la generación de preguntas en español.
-2. Realizar técnica de few shot prompting y evaluar los resultados obtenidos.
-3. Efectuar fine tuning sobre LLaMa2 y buscar mejores resultados respecto al punto anterior.
-4. Determinar las mejoras obtenidas en cada enfoque y realizar conclusiones acerca de las mismas.
+Los **objetivos preliminares** planteados fueron:
+*  Detectar limitaciones del modelo elegido para la generación de preguntas en español.
+* Aplicar *few shot prompting* y evaluar los resultados obtenidos.
+* Efectuar *fine tuning* sobre el modelo y buscar mejores resultados respecto al punto anterior.
+* Determinar las mejoras obtenidas en cada enfoque y realizar conclusiones acerca de las mismas.
 
-En general, los objetivos planteados inicialmente se mantuvieron. Algunos objetivos surgieron mientras trabajabamos en el proyecto. Uno de ellos es hacer una investigación exhaustiva de los modelos de lenguaje que soporten la generación de texto en español, dado a que nos vimos obligados a cambiar la familia de versiones del modelo debido a la falta de soporte y benchmarks para el español del modelo elegido previamente a `Llama 3.1`.
-Otro objetivo que surgió es definir un tipo de texto específico sobre el cual trabajar las preguntas a generar, esto lo hicimos debido a la inmensa diversidad de tipos de artículos que hay en la Wikipedia. Pensamos que sería mejor abordar un tipo de artículo para luego poder trabajar sobre otros y así obtener mejores resultados.
-Por otro lado, decidimos definir lo más preciso posible el tipo de preguntas que deseabamos que el modelo nos devuelva, junto con los críterios que ibamos a usar para definir cuándo una pregunta iba a ser considerada "bien generada" de acuerdo a los objetivos del proyecto.
+Sin embargo, a lo largo del desarrollo del proyecto fueron surgiendo los siguientes objetivos 
 
-## Avances en la metodologia
+* Realizar una invesigación exhaustiva de los modelos de lenguaje que fueron entrenados para generar texto en español.
+* Aplicar *zero-shot prompting* y evaluar los resultados obtenidos.
+* Seleccionar el tipo de texto específico sobre el cual el modelo realizará preguntas.
+* Definir críterios de evaluación para las preguntas generadas por el modelo de acuerdo con el objetivo del proyecto.
+* Elegir un conjunto de datos apropiado para realizar el *fine tuning* del modelo.
 
-Existen diferentes tecnicas para lograr que un modelo dado realice de forma correcta una tarea especifica.
-En este proyecyo se utilizan varias tecnicas diferentes, las cuales se mencionan a continuacion: Few-shot learning y zero-shot learning, fine-tunning, cuantizacion.
 
-#### Zero-shot learning
-*Zero-shot learning* (sin ejemplos) es una técnica que consiste en interactuar como el modelo sin incluirle ejemplos ni demostraciones junto con la instrucción de la tarea. Es decir, directamente solicitar la intrucción a realizar sin ejemplos de cómo queremos los resultados [4].
+## Técnicas relevantes
 
-Dado a que inicialmente comenzamos trabajando sobre la versión `"meta-llama/Llama-3.1-8B"` (versión base), la cual no tiene formato para la entrada. Como otros modelos base, pueden ser usados solamente para continuar la seceuencia que se les proporciona [5]. 
-En este proyecto utilizamos esta técnica al principio, para lograr que el modelo produzca preguntas. A continuación se muestra una de las entradas que usamos para probar el modelo:
+Existen diferentes técnicas para lograr que un modelo realice de forma correcta una tarea específica. En este proyecto se abordaron las siguientes técnicas: *zero-shot learning*, *few-shot learning*, *system prompt*, *fine tuning* y cuantización.
+
+### Zero-shot learning
+*Zero-shot learning* (sin ejemplos) es una técnica que consiste en interactuar con el modelo proporcionando la instrucción a realizar sin incluir ejemplos ni demostraciones de cómo queremos que sea realizada [4].
+
+Esta técnica la utilizamos inicialmente buscando descubrir la clase de preguntas generadas por los modelos base de la familia Llama 3.1, los cuales no poseen un entrenamiento específico en esta tarea.
+
+Un modelo base no sigue instrucciones. Fue entrenado sobre una gran cantidad de datos para adquirir conocimientos básicos acerca del lenguaje, conocimiento general y contextos, por lo que es útil en situaciones donde debe dar respuestas de conocimiento general o conversaciones casuales. Sin embargo, para obtener lo que deseamos en este proyecto debemos solicitarlo de forma diferente, agregando indicaciones extras o guías adicionales [10].
+
+A continuación, presentamos un ejemplo de entrada que usamos para probar el modelo `meta-llama/Llama-3.1-8B`:
 
 ```python
 prompt = article[0] + article[1] + "\n\n En base al texto anterior, responder las siguientes 5 preguntas:"
 ```
 
-dónde `article[0]` y `article[1]` es el primer y segundo párrafo de un artículo de la Wikipedia sobre Gueorgui Vasílievich Chicherin [6].
-El modelo respondió a la entrada de la siguiente manera:
+siendo `article[0]` y `article[1]` el primer y segundo párrafo respectivamente de un artículo de Wikipedia. De esta manera, incentivamos al modelo a generar preguntas respecto al texto que le proporcionamos.
+
+### Few-shot learning
+
+*Few-shot learining* es una técnica que consiste en pasarle al modelo, junto con la instrucción de la tarea, unos pocos ejemplos que sirvan como guía para aprender el patrón de los resultados que deseamos obtener [3].
+
+La idea de utilizar esta técnica en nuestro proyecto surge, principalmente, al darnos cuenta que los modelos naturalmente no generan preguntas de verdadero o falso. Entonces, necesitábamos proporcionarles ejemplos para incentivarlos a generarlas.
+
+Un ejemplo de entrada que le proporcionamos al modelo usando este enfoque es el siguiente:
+
+```python=
+Agregar ejemplo, modelo base con técnicas de few shot donde se agregen ejemplos de verdaderos o falsos
 ```
-En base al texto anterior, responder las siguientes 5 preguntas: 
-¿Qué año falleció Gueorgui Vasílievich Chicherin?
-¿En qué país estaba cuando estalló la Primera Guerra Mundial?
-¿Qué posición adoptó Gueorgui Vasílievich Chicherin al inicio de la Primera Guerra Mundial?
-¿Cuál fue el cargo que ocupó Gueorgui Vasílievich Chicherin en el gobierno soviético?
-¿Qué país relevó a Gueorgui Vasílievich Chicherin de su cargo en el gobierno soviético? 
-```
-Esta técnica nos permitió testear al modelo de forma rápida y descubrir que esta versión de la familia LLaMa generaba preguntas que se acercaban al formato de las preguntas típicas de un cuestionario de evaluacion.
 
-#### Few-shot learning (aprendizaje con pocos ejemplos).
+### System prompts
 
-Few-shot learining es una técnica de aprendizaje automático en la cual se le pasa al modelo junto con la instrucción algunos ejemplos, generalemente pocos, que servirán como guía para aprender el patrón de los resultados que deseamos [3].
+*System prompts* son un conjunto de instrucciones, guías e información acerca del contexto que se le provee al modelo antes de interactuar con las consultas del usuario [11].
 
-Como mencionamos el subtítulo anterior, comenzamos trabajando con la versión del modelo base pero nos dimos cuenta que la versión *finetuneada* para recibir instrucciones `"meta-llama/Llama-3.1-8B-Instruct"` le podíamos sacar más provecho para hacer prompting debido a que estaba adaptado para recibir instrucciones y usar roles en los mensajes que se le pasan al modelo para especificar contextos y guias. Entre esos roles, destacamos *system* que sirve para establecer el contexto de una conversación o información necesaria que ayude al modelo a responder efectivamente y *user* para denotar la entrada del usuario [5].
+El uso de modelos base para la generación de preguntas presenta varias limitaciones. En primer lugar, no permite especificar de manera directa la cantidad y el tipo de preguntas a generar. Además, requieren estrategias más avanzadas de ingeniería de *prompts* para guiar de forma adecuada la generación de las preguntas, lo que implica un mayor esfuerzo en el diseño de instrucciones óptimas. Por estos motivos, se decidió optar por un modelo instruido como `meta-llama/Meta-Llama-3.1-8B-Instruct`, lo que también tendrá un impacto positivo en el *fine tuning*, ya que nos permite enfocarnos en mejorar el desempeño en la tarea específica, sin la necesidad de enseñarle al modelo a interpetar las instrucciones desde cero.
 
-Es así como, con instrucciones más precisas y además el uso de roles, armamos una nueva entrada enfocada en esta técnica proporcionando algunos ejemplos de preguntas realizadas por nosotros.
+El cambio de modelo a `"meta-llama/Llama-3.1-8B-Instruct"` nos permitió aplicar esta técnica en nuestro proyecto, debido a que cuenta con ciertos roles, entre los cuales destacamos *system* y *user*. El rol *system* sirve para establecer el contexto de una conversación o proveerle al modelo información necesaria para ayudarle a responder efectivamente, mientras que el rol *user* representa la entrada del usuario [5].
+
+El siguiente fragmento de código muestra cómo definimos los roles `system`  y `user` en nuestras consultas al modelo:
 
 ```python
 prompt = [
-    {"role":"system", "content": '''Eres un generador de preguntas de lectura comprensiva y de tipo verdadero falso, sin generar las respuestas. Algunas de las preguntas que puedes hacer es:  Preguntas de tipo respuestas cortas:
-     1. ¿Cuándo y dónde nació?
-     2. ¿En que fecha murió y cuál fue la causa de su muerte?
-     3. ¿Cuáles eran sus ocupaciones?
-     4. ¿Dónde estudió?
-     Verdadero o Falso:
-     5. Fue un criptogŕafo reconocido, ¿Verdadero o Falso?.
-     6. No contribuyó a la Teoría de la Relatividad de Einstein, ¿Verdadero o Falso?'''},
-    {"role":"user", "content": "Hacer 5 preguntas de lectura comprensiva de tipo de respuesta corta y 5 de tipo verdadero o falso, sobre el siguiente texto:\n" + godel}
-    ]
-```
-En este caso, la salida del modelo fue la siguiente:
-
-```
-Preguntas de lectura comprensiva de tipo de respuesta corta:
-
-1. ¿En qué ciudad nació Kurt Friedrich Gödel?
-2. ¿Cuál fue el tema elegido por Gödel para su disertación doctoral?
-3. ¿Qué título recibió Gödel en 1933 en la Universidad de Viena?
-4. ¿Qué título recibió Gödel en 1946 en el Instituto de Estudios Avanzados?
-5. ¿Qué título recibió Gödel en 1976 en el Instituto de Estudios Avanzados?
-
-Preguntas de lectura comprensiva de tipo verdadero o falso:
-
-1. Fue un lógico, matemático y filósofo austríaco, ¿Verdadero o Falso?
-2. No contribuyó a la Teoría de la Relatividad de Einstein, ¿Verdadero o Falso?
-3. Fue un criptogŕafo reconocido, ¿Verdadero o Falso?
-4. No estudió en la Universidad de Viena, ¿Verdadero o Falso?
-5. No recibió el Premio Albert Einstein en 1951, ¿Verdadero o Falso?
+    {
+        "role": "system",
+        "content": (
+            "Eres un generador de preguntas de lectura comprensiva. "
+            "Tu tarea es crear preguntas basadas en un texto dado, "
+            "sin incluir respuestas ni opciones. Solo debes generar preguntas, "
+            "en las cuales deberás incluir preguntas de tipo verdadero o falso."
+        ),
+    },
+    {
+        "role": "user",
+        "content": (
+            "Genera exactamente 10 preguntas, de las cuales 5 deben ser de tipo "
+            "verdadero o falso, sin incluir las respuestas ni opciones, sobre el siguiente texto:\n\n"
+            f"{article}"
+        ),
+    },
+]
 ```
 
-Se intentó mostrarle un ejemplo de la tarea en el rol de usuario, como resultado el modelo interpretaba las preguntas como si tuviese que responderlas, a veces generando preguntas nuevas y a veces no.
-Cambiamos este enfoque poniendo los ejemplos en el role system y los resultados mejoraron notablemente debido a que obtuvimos preguntas sin mostrarse sus respuestas y enfocado en ejemplos proporcionados en la entrada.
-Un problema que se observo es que al mencionar en la instruccion que el tipo de la pregunta debia ser de "respuesta corta", dejaba de interpretar la parte de la instruccion que pedia que no muestre las respuestas. Luego nos dimos cuenta que estabamos ingresando las instrucciones en el role user y debia colocarse en el rol system, ya que dicho rol es el que guia al modelo en como realizar la tarea.
+### Cuantización
+La cuantización es una técnica que nos permite comprimir modelos extensos de lenguaje representando sus pesos y activadores, los cuales están típicamente en números flotantes de 32-bits de precisión, con valores de menor precisión, usualmente 8-bits o 4-bits. La reducción en el número de bits provoca una gran disminución en el tamaño del modelo, por lo que consumen menos memoria, requieren menos espacio de guardado y son más rápidos de aplicarle *fine tuning* [2][12].
 
-#### Cuantización
-Es una técnica usada en machine learning para reducir el uso de los recursos computacionales y de memoria de los modelos grandes de lenguaje, para hacerlos más eficientes [2].
-Se decidió aplicar esta técnica a los modelos probados, debido a que incluso con versiones de pocos parámetros, la ejecución tardaba demasiado o incluso excedía los recursos disponibles en nuestro entorno de ejecución. A través de la cuantización de 4 bits pudimos ejecutar los modelos más pequeños de la familia LLaMa como ser las versiones `Llama2-7B` y `Llama3-8B` y también Llama3-8B-Intruct, donde este ultimo tiene más párametros.
+![imagen](https://i.imgur.com/3WSwSJF.png)
+
+El modelo `"meta-llama/Llama-3.1-8B-Instruct"` requiere disponer de al menos 16 GB de RAM [13]. Sin embargo, dado que nuestro entorno de ejecución en Google Colab solo ofrecía 15 GB de RAM, se hizo necesario aplicar cuantización para reducir el modelo. Para ello, implementamos la técnica NF4 (*4-bit Normal Float*), la cual cuantifica los pesos a 4 bits, permitiéndonos ejecutar y evaluar distintos modelos (como Llama2-7B, Llama3.1-8B y Llama3.1-8B-Instruct) pese a las limitaciones de recursos del entorno.
+
+Además, un artículo de Hugging Face [14], nos permitió saber antes de entrenar nuestro modelo que sería posible hacerlo en este entorno limitado usando GC (*gradient checkpointing*) y *nested quantization*.
+
+### Fine tuning
+
+*Fine tuning* es el proceso de ajustar los parámetros de un modelo extenso de lenguaje pre-entrenado para una tarea o dominio específico a través de un conjunto de datos. Esto dado que, los grandes modelos poseen un conocimiento amplio pero carecen de especialización en áreas específicas, por lo que esta técnica ataca ese problema haciendo a los modelos más acertados y efectivos para ciertos dominios o aplicaciones [9].
+
+*Supervised Fine Tuning* es un método para mejorar y personalizar modelos pre-entrenados, la cual consiste en volver a entrenar estos modelos en un conjunto de datos etiquetado, compuesto por las instrucciones y las respuestas que se desean. Las tres técnicas más populares para aplicar SFT son *full fine-tuning*, *LoRA* y *QLoRA*.
+
+![imagen](https://i.imgur.com/IG9s8Yk.png)
+
+*QLoRA (Quantization-aware Low-Rank Adaptation)* es una técnica que en lugar de entrenar el modelo entero, congela los pesos e introduce pequeños adaptadores denominados *low-rank matrices* lo que le permite reducir mucho el número de parámetros a entrenar, reduciendo el uso de la memoria y el tiempo de entrenamiento respecto al *full fine-tuning*. Esta técnica es ideal para entornos donde la memoria GPU es limitada y por eso fue la elegida para entrenar nuestro modelo. La siguiente imagen ilustra la reducción de parámetros entrenables que esta técnica realizó en nuestro caso.
+
+![](https://i.imgur.com/vqrHSB7.png)
+
+El conjunto de datos que seleccionamos para esta técnica fue *Spanish Question Answering Corpus* (SQAC) [15], que se compone de preguntas-respuestas extractivas en español. Sin embargo, lo consideramos ideal para la tarea de este proyecto, ya que posee contextos extraídos de artículos de Wikipedia, noticias de WikiNews y la sección española de AnCora corpus que es una mezcla de diferentes fuentes de noticias y literatura. Además, no posee preguntas sin respuestas y tanto las preguntas como las respuestas fueron anotadas por hablantes nativos de español con estudios universitarios [17]. 
+
+Ahora bien, a este conjunto de datos fue necesario realizarle un pre-procesamiento donde solamente nos quedamos con contextos provenientes de la sección "Biografías" de artículos de Wikipedia. Posterior a eso, nos quedamos con las columnas `context` y `question` para, a partir de ellas, armar una sola columna (`text`) representando una conversación entre un usuario que provee un contexto y solicita una cierta cantidad de preguntas, y un asistente que genera las preguntas a partir de ese contexto.
 
 ## Problemas encontrados
 
-A continuación nombraremos algunos de los problemas encontrados durante el desarrollo del proyecto y cómo se abordaron.
+En esta sección detallamos los principales desafíos que surgieron durante el desarrollo del proyecto y las estrategias implementadas para resolverlos.
 
-**Recursos y entorno de ejecución:** utilizamos Google Colab debido a su fácil acceso y adecuación para probar versiones de pocos parámetros de modelos extensos de lenguaje. Sin embargo, los recursos ofrecidos por este entorno comienzan a limitarnos a medido que el proyecto va avanzando en complejidad. Esto lo abordaremos, usando un nuevo entorno de ejecución más potente (CCAD) brindado por la UNC.
+### Recursos y entorno de ejecución
 
-**Elección del tipo de preguntas a generar**: empezamos probando el modelo para la tarea de generar preguntas en base a un artículo, pero no definimos previamente el tipo de preguntas que esperabamos, esto generó incertidumbre en el momento de definir cuándo estabamos mejorando la calidad de las preguntas. Para este problema lo que hicimos fue definir una serie de pautas enfocados en las características de las preguntas:
-* *Tipo de preguntas:* seleccionamos preguntas de tipo "respuestas cortas" y de tipo "verdadero o falso". Las respuestas a las preguntas de tipo "respuesta corta" deben ser de una palabra u oración, y las respuestas a ambos tipos deben estar presentes en el artículo. La motivación en la elección de cada tipo fue:
-    * Respuesta corta: mayor retroalimentación y mayor sencillez en la corrección que otro tipo de preguntas (tipo abiertas por ejemplo). 
-    * VoF: facilidad de corrección.
-* *No repetición:* buscamos diversidad en preguntas, por lo tanto dos preguntas de la misma lista no deben ser idénticas y tampoco demasiado similares. A continuación dejamos un ejemplo de preguntas similares que queremos evitar
+Comenzamos utilizando Google Colab en el proyecto debido a sus ventajas,  como la accesibilidad, colaboración en tiempo real y disponibilidad de GPU gratuitas. Continuamos usando esta plataforma en cada etapa, incluyendo el *fine tuning*. Sin embargo, a medida que el proyecto avanzaba, los recursos ofrecidos por este entorno comenzaron a limitarnos, lo que nos hizo recurrir a las técnicas de cuantización y optimización del rendimiento mencionadas anteriormente.
+
+### Elección del tipo de preguntas a generar
+
+En primera instancia, probamos el desempeño de diferentes modelos en la terea de generar preguntas en base a un artículo. No obstante, la comparación entre las preguntas generadas cada vez fue más difícil de hacer, lo que nos hizo pensar que nuestra forma de categorizar preguntas como "buenas" o "malas" carecía de certeza, provocando incertidumbre al momento de decidir si la calidad de las preguntas generadas mejoraba. Para solucionarlo, definimos una serie de pautas acerca de la características que deseamos que las preguntas generadas por el modelo posean:
+* *Tipos de preguntas:* los tipos de preguntas que se desean generar son de respuesta corta y sentencias a determinar en verdaderas o falsas. Además, se considerará que la respuestas a dichas preguntas estén presentes dentro del artículo proporcionado.
+* *No repetición:* deseamos diversidad de preguntas, por lo tanto, dos de la misma lista no deben ser ni idénticas ni demasiado similares. A continuación, dejamos un ejemplo de preguntas similares que queremos evitar.
   ```
-   Preguntas 1: ¿Que hizo en el Siglo 19?
-   Preguntas 2: ¿Que hizo en el Siglo 20?
+   Pregunta 1: ¿Qué hizo en el Siglo 19?
+   Pregunta 2: ¿Qué hizo en el Siglo 20?
   ```
-* *Naturalidad y fluidez:* las preguntas generadas no deben mostrar un estructura mecanizada y evitando repeticiones innecesarias, así como si hubiesen sido hechas por una persona.
-* *Variedad:* priorizaremos la relevancia pero tendremos en cuenta que sean abarcativas a los temas tratados en el articulo.
-* *Grado de dificultad:* buscamos que se generen preguntas para niveles de comprensión desde básico a intermedio.
-* *Orientadas al refuerzo de la comprensión *: Las preguntas buscan evaluar a quién las responda en su habilidad para identificar ideas principales y detalles específicos (por ejemplo: fechas).
+* *Naturalidad y fluidez:* las preguntas generadas deben evitar una estructura mecanizada, minimizando repeticiones innecesarias y mostrando una formulación de preguntas similiar a las realizadas por una persona.
+* *Completitud:* priorizaremos la relevancia de las preguntas pero tendremos en cuenta que sean abarcativas a los temas tratados en el articulo.
+* *Orientadas al refuerzo de la comprensión:* las preguntas buscarán evaluar a quien las responda en su habilidad para identificar ideas principales y detalles específicos (por ejemplo: fechas).
 
-**Elección del modelo:**
+### Elección del modelo
 
-Definir que versión del modelo a usar nos llevó demasiado tiempo debido a que tuvimos que investigar y probar las diferentes posibilidades. El modelo extenso de lenguaje que decidimos utilizar es LLaMa en su versión `meta-llama/Llama-3.1-8B-Instruct`. 
-Para tomar esta decisión, lo primero que consideramos fue hacer una evaluación manual sobre las versiones `meta-llama/Llama-2-13b-hf` y `meta-llama/Llama-3.1-8B` acerca de qué tan bien generaban texto en español.
+Definir el modelo y la versión a usar del mismo nos llevo más tiempo del que esperábamos, ya que tuvimos que investigar y probar diferentes posibilidades.
 
-Mediante esta evaluación determinamos que `meta-llama/Llama-3.1-8B` generaba texto en español con coherencía y fluidez, contrario a `meta-llama/Llama-2-13b-hf` que inclusive repetía oraciones generadas, en lugar de generar nuevas, lo que lo volvía poco natural. Un ejemplo del resultado de las pruebas realizadas se muestra a continuación, donde se le pidió a ambos modelos que generen texto a partir de la entrada`"El perro estaba "` con los mismos parámetros para los dos: 
+Debíamos buscar modelos que tengan soporte para la generación de texto en español. En dicha búsqueda, encontramos a la familia de modelos LLaMa en su versión 3.1 que son multilingües [16]. Para comprender la importancia de este punto, en la siguiente subsección mostraremos una comparativa sencilla entre la capacidad de generación de texto en español del modelo `meta-llama/Llama-2-13b-hf`, que no tiene soporte oficial para el idioma, y `meta-llama/Llama-3.1-8B`.
+
+Además, como mencionamos en la sección *system prompt*, terminamos eligiendo el modelo `meta-llama/Llama-3.1-8B-Instruct` ya que nos otorgaba más facilidades para solicitarle instrucciones al modelo.
+
+#### Comparativa: soporte para la generación de texto en español
+
+La comparativa constó en solicitarle a ambos modelos completar una sentencia que comenzaba con `"El perro es"`, con los mismos parámetros de generación, entre los cuales incluimos un número para `max_new_tokens` para así evitar secuencias generadas que sean muy largas. La siguiente imagen es un ejemplo de los textos generados por ambos modelos.
 
 ![Compartiva](https://i.imgur.com/UsBXOZ6.png)
 
-Al entrar en detalle sobre los modelos, observamos vía su página web que a diferencia de su versión 3.1, `Llama-2` no había sido entrenado con el objetivo de la generación de texto en múltiples idiomas, lo que fue determinante para dejar de considerarlo como una posibilidad.
+Como ya hemos mencionado a lo largo del artículo, la elección del modelo  `"meta-llama/Llama-3.1-8B-Instruct"` fue clave para el *prompting*, debido a que puede interpretar instrucciones y usar roles en su entrada para adaptar su salida [6].
 
-Como ya hemos mencionado a lo largo del artículo, la elección del modelo orientado a instrucciones `"meta-llama/Llama-3.1-8B-Instruct"` fue clave para el *prompting* debido a que puede interpretar instrucciones y usar roles en su entrada para adaptar su salida [7].
+### Reducir el dominio
 
-**Elección tipo de texto:** dado a que decidimos trabajar con artículos de Wikipedia y la misma contiene una extensa cantidad de tipos de artículos se decidió restringir el dominio a biografías. Incluso de esta manera, tenemos el problema de que dos biografías pueden ser muy distintas entre sí respecto a los temas tratados en ellas. 
+Los artículos presentes en Wikipedia pueden tratarse de diversos temas, asimismo una pregunta puede ser menos relevante en un artículo que en otro. Es por eso que decidimos reducir el dominio de los artículos a solo biografías, sobre los cuales evaluaremos las preguntas generadas. De esta manera, sería más fácil evaluar la calidad de las preguntas y detectar las limitaciones del modelo.
 
-Pensamos trabajar para la próxima entrega con biografías más variadas (pej. incluyendo personajes históricos de diversas ramas) y manejar los posibles problemas futuros que se presenten.
+### Respuestas no solicitadas junto con las preguntas generadas
 
-**Detectar limitaciones:** si bien el modelo con la versión orientada a instrucciones generaba preguntas bastante bien, notamos que bajo la instruccion de "generar preguntas" sin especificar un tipo de las mismas, el modelo solo generaba preguntas de tipo abiertas, lo cual alcanzaba nuestro objetivo parcialmente, ya que no geraba preguntas de tipo verdadero o falso  por defecto. Cabe destacar tambien que las preguntas , en general, no eran de respuesta corta si no de respuestas "abiertas".
-    * Intentamos adaptar la complejidad de las preguntas para que no sean ni muy largas de responder, ni muy fáciles.
+La tarea que le solicitamos al modelo siempre fue generar preguntas a partir de un determinado contexto. Uno de los problemas que surgieron con esta solicitud fue que el modelo también generaba las respuestas de dichas preguntas, inclusive si le especificábamos explícitamente que no lo haga, a través del rol `system`. A este problema pudimos solucionarlo parcialmente, mediante la técnica de *few shot prompting* en conjunto con una mejora en la redacción de la solicitud suministrada realizando una más corta y directa. Sin embargo, la solución definitiva a este problema fue el *fine tuning*.
+
+### Error en una URL del conjunto de datos
+
+El conjunto de datos que decidimos utilizar está presente como `Dataset` en Hugging Face [14], para facilitar su uso mediante su API. No obstante, el módulo encargado de descargarlo llamado `SQAC.py` posee un error en una URL que nos lleva a una página que no existe y lo cual no permite obtenerlo mediante el comando `load_dataset("PlanTL-GOB-ES/SQAC")`. Para solucionarlo, debimos descargar los archivos del conjunto de datos desde la página de HF y cambiar el valor de la variable `_URL` del archivo `SQAC.py` por `"https://huggingface.co/datasets/PlanTL-GOB-ES/SQAC/resolve/main/"`.
+
+Este error lleva tiempo ahí, inclusive un usuario solicitó un *pull request* con la solución, sino que aún no ha sido aceptada [17].
+
+### Familia de modelos LLama3 y los tokens de relleno
+
+El tokenizador de la familia de modelos LLaMa, no poseen un `pad_token` definido, lo que es un problema para hacer inferencia, y también, para aplicar *fine tuning* sobre ellos. Hemos investigado mucho al respecto, y es un hecho, la falta de información oficial sobre este tema provoca una gran confusión entre los usuarios [18][19]. La solución que abordamos para este problema fue la que habitualmente se utiliza, definir el `pad_token` igual que el `eos_token` y mantener un tamaño de *batch* de 1 durante el entrenamiento para evitar problemas debido al token de relleno.
+
+### Fine tuning
+
+Adoptamos como primer enfoque implementar la técnica de *fine tuning* sobre 1000 preguntas repartidas en 840 contextos diferentes del conjunto de datos SQAC. No obstante, en el entrenamiento del modelo pudimos notar que algo andaba mal debido a que el *training loss* no disminuía, sino que oscilaba siempre entre los mismos valores, como se puede observar en el siguiente gráfico:
+
+![Training loss sin cambios](https://i.imgur.com/wPDLTNc.pngg)
+
+Al finalizar el entrenamiento y evaluar el modelo, observamos que la generación de texto carecía de coherencia y naturalidad. Además, el modelo tendía a repetir las pocas preguntas que lograba formular y no incluía un token especial de terminación, sino que entraba en un bucle generando contenido repetitivo (lo que suele ser un problema entre los usuarios [20]).
+
+Nuestra hipótesis fue que el modelo no lograba captar el patrón en los datos suministrados para lograr aprender de ellos. En una primera instancia, pensamos que era porque había demasiados tipos de artículos distintos en los fragmentos del conjunto de datos, por lo que probamos entrenar el modelo nuevamente, pero esta vez, filtrando aquellos contextos que provengan de la sección "Biografía" de algún artículo, y entrenando el modelo con conversaciones formuladas a partir de las preguntas asociadas a tales contextos.
+
+Cabe aclarar que un mismo contexto puede poseer varias preguntas asociadas, lo que provoca que se repita varias veces en el conjunto de datos (tantas veces como preguntas asociadas tenga), entonces fue necesario agrupar las preguntas por contexto para generar las conversaciones antes mencionadas.
+
+![Comparacion training loss 1](https://i.imgur.com/w6N63VM.png)
+
+Como podemos ver en la imagen anterior, este nuevo enfoque hizo que el *training loss* disminuyera. Sin embargo, los problemas de generación seguían sin ser solucionados. Por lo tanto, la causa del problema era otra y efectivamente, revisando la documentación de las funciones que habíamos usado para entrenar el modelo notamos que `SFTTrainer` tenía un formato específico para recibir el conjunto de datos de entrenamiento sin necesidad de ser pre-procesado directamente antes, que es lo estábamos haciendo mediante el `tokenizer` del modelo [21]. Entonces, elegimos el formato conversacional el cual tiene la siguiente estructura:
+
+```python
+{"messages": [{"role": "system", "content": "You are helpful"}, {"role": "user", "content": "What's the capital of France?"}, {"role": "assistant", "content": "..."}]}
+{"messages": [{"role": "system", "content": "You are helpful"}, {"role": "user", "content": "Who wrote 'Romeo and Juliet'?"}, {"role": "assistant", "content": "..."}]}
+```
+Con el cual, como podemos ver en la imagen a continuación obtuvimos una mayor disminución del *training loss* y además, el modelo entrenado genera un token especial para indicar cuando ha terminado.
+
+![Comparacion training loss 2](https://i.imgur.com/ajH9UgV.png)
 
 
-**El modelo devolvía respuestas no solicitadas:** al presentarse tantas veces la palabra "respuesta" en el prompt el modelo mal interpretaba y generaba respuestas junto con las preguntas cuándo de manera explícita le pedimos que no lo haga. Esto lo abordamos modularizando el prompt en varios mensajes de sistema y vez de hacer un prompt más largo, hicimos uno más corto y específico.
-
-**Preguntas demasiado estructuradas**: buscamos que el modelo genere repuestas naturales y no tán robóticas. Esto pensamos solucionarlo dando más ejemplos proporcionados por nosotros.
-
-
-**Implementacion de rol system y el rol usuario:** hay información que deseabamos introducirle al modelo como ejemplos de tipo de preguntas o el texto mismo, las cuales no sabíamos en cuál rol suministrarselas. Para solucionarlo, hicimos diversas pruebas pasando la información en ambos roles y nos quedamos con el promting que mejor resultados nos otorgaba.
-
-
-**Enfoque del few-shot:** tenemos dos enfoques posibles pasarle varios ejemplos junto con los artículos o solo ejemplos de preguntas generales sobre biografías que se podrían realizar. Para esto, pensamos hacer una evaluación sobre ambos enfoques.
-
-**Fine tuning:** aún no hemos investigado cómo hacerlo, por lo cual pensamos investigar más sobre como hacerlo en este modelo a través de trabajos previos o mismo recursos disponibles en la web.
-
-##  Evaluacion del progreso
-Hasta ahora se realizó una evaluación anedótica manual mediante comparaciones entre los diferentes resultados obtenidos cambiando las entradas y las técnicas utilizadas. Se planea para un futuro investigar alternativas de evaluacion.
-
-
-## Planificación actualizada
-
-* Fine tuning (Semana del 27/10)
-    * Preparar el conjunto de datos para usar la técnica.
-        * Determinar la forma que tendrá nuestro conjunto de datos.
-        * Seleccionar los artículos sobre los cuales haremos las preguntas.
-        * Hacer las preguntas.
-        * Limpiar el conjunto de datos para su posterior utilización.
-    * Realizar fine tuning del modelo con el conjunto de datos.
-    * Evaluar las preguntas generadas y comparar con los resultados previos logrados con el resto de las técnicas.
-    * Documentar el proceso, observaciones y resultados. 
-    * Elaborar una conclusión donde se comparen los resultados y el costo de aplicar cada una de las técnicas.
-    * Hacer correcciones finales sobre las netbooks.
+###  Evaluación del progreso
+Hasta ahora se realizó una evaluación anecdótica manual comparando los diferentes resultados obtenidos al cambiar las entradas y las técnicas utilizadas. Se planea para un futuro investigar alternativas de evaluación.
 
 ****************************************
 
-### Nuevas referencias
+### Referencias
 
 1. https://urjconline.atavist.com/2023/06/29/pregunta-tipo-respuesta-corta/.
 2. https://www.llama.com/docs/how-to-guides/quantization/.
 3. https://www.llama.com/docs/how-to-guides/prompting.
 4. https://www.promptingguide.ai/techniques/zeroshot.
 5. https://huggingface.co/blog/llama31#how-to-prompt-llama-31.
-6. https://es.wikipedia.org/wiki/Gueorgui_Chicherin.
-7. https://huggingface.co/blog/llama31#using-hugging-face-transformers.
+6.  https://huggingface.co/blog/llama31#using-hugging-face-transformers.
+7.   https://promptengineering.org/system-prompts-in-large-language-models/
+8.   https://www.turing.com/resources/finetuning-large-language-models.
+9.   https://toloka.ai/blog/base-llm-vs-instruction-tuned-llm/.
+10.   https://promptengineering.org/system-prompts-in-large-language-models/.
+11.   https://www.datacamp.com/tutorial/quantization-for-large-language-models?utm_source=chatgpt.com.
+12.   https://llamaimodel.com/requirements/.
+13.   https://huggingface.co/blog/4bit-transformers-bitsandbytes.
+14.   https://huggingface.co/datasets/PlanTL-GOB-ES/SQAC.
+15.   https://ai.meta.com/blog/meta-llama-3-1/.
+16.   https://portal.odesia.uned.es/dataset/sqac-es.
+17.   https://huggingface.co/datasets/PlanTL-GOB-ES/SQAC/discussions/4
+18.   https://discuss.huggingface.co/t/llama-pad-token/48001.
+19.   https://discuss.huggingface.co/t/how-to-set-the-pad-token-for-meta-llama-llama-3-models/103418/6.
+20.   https://huggingface.co/meta-llama/Meta-Llama-3-8B/discussions/60.
+21.   https://huggingface.co/docs/trl/v0.11.1/en/sft_trainer#dataset-format-support.
+22.   https://huggingface.co/docs/transformers/v4.32.1/llm_tutorial.
