@@ -52,8 +52,15 @@ La idea de utilizar esta técnica en nuestro proyecto surge, principalmente, al 
 
 Un ejemplo de entrada que le proporcionamos al modelo usando este enfoque es el siguiente:
 
-```python=
-Agregar ejemplo, modelo base con técnicas de few shot donde se agregen ejemplos de verdaderos o falsos
+```python
+prompt = (
+    f"En base al siguiente texto:\n\n{article}\n\n"
+    "Responde las siguientes 10 preguntas:\n"
+    "1. ¿En qué fecha nació Alan Turing?\n"
+    "2. ¿Dónde nació Alan Turing?\n"
+    "3. La máquina sobre la cual trabajó durante la guerra se llamó máquina Enigma. ¿Verdadero o Falso?\n"
+    "4. Se estima que el trabajo de Turing durante la guerra acortó la misma entre 2 y 4 años. ¿Verdadero o Falso?\n"
+)
 ```
 
 ### System prompts
