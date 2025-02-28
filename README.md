@@ -6,24 +6,25 @@ Este proyecto presenta una prueba de concepto para un generador de preguntas de 
 **Autores:** *Franco Artico* y *Nain Cadro*.
 
 ## Hipótesis, objetivos iniciales y el estado final alcanzado
-Las **hipótesis** sobre las cuales se desarrolló este proyecto son:
-* El modelo presenta fallas en la generación de preguntas en español, las cuales podrían ser errores sintácticos o preguntas desalineadas con los objetivos del proyecto.
-* La reducción del dominio del problema nos permitirá identificar más errores y mejorar la calidad de las preguntas generadas.
 
-Los **objetivos preliminares** planteados fueron:
-*  Detectar limitaciones del modelo elegido para la generación de preguntas en español.
-* Aplicar *few shot prompting* y evaluar los resultados obtenidos.
-* Efectuar *fine tuning* sobre el modelo y buscar mejores resultados respecto al punto anterior.
-* Determinar las mejoras obtenidas en cada enfoque y realizar conclusiones acerca de las mismas.
+Nuestra **hipótesis inicial** planteaba que el modelo seleccionado presentaría dificultades en la generación de preguntas de lectura comprensiva a partir de un texto en español, mostrando errores sintácticos o generando preguntas desalineadas a las estipuladas en el proyecto. Para poner a prueba nuestra hipótesis, primero investigamos y seleccionamos un modelo para evaluarlo. Además, fue imprescindible definir el tipo de preguntas que deseábamos generar y ciertos criterios para evaluarlas.
 
-Sin embargo, a lo largo del desarrollo del proyecto fueron surgiendo los siguientes objetivos 
+Con el modelo seleccionado (`meta-llama/Meta-Llama-3-8B-Instruct`) realizamos diversas pruebas las cuales mostraron que, efectivamente, presentaba deficiencias en la tarea solicitada las cuales pudieron ser identificadas y abordadas mediante las técnicas establecidas en los objetivos.
 
-* Realizar una invesigación exhaustiva de los modelos de lenguaje que fueron entrenados para generar texto en español.
-* Aplicar *zero-shot prompting* y evaluar los resultados obtenidos.
-* Seleccionar el tipo de texto específico sobre el cual el modelo realizará preguntas.
-* Definir críterios de evaluación para las preguntas generadas por el modelo de acuerdo con el objetivo del proyecto.
-* Elegir un conjunto de datos apropiado para realizar el *fine tuning* del modelo.
+Durante el desarrollo del proyecto, ajustamos nuestro enfoque, reduciendo el dominio del problema a biografías o fragmentos de ellas. Este cambio nos permitió identificar dificultades más fácilmente en la generación de preguntas en comparación con trabajar con la extensa variedad de artículos disponibles en Wikipedia.
 
+De esta manera, la siguiente lista es cómo quedaron constituidos los objetivos que nos propusimos alcanzar a lo largo del proyecto:
+1. Investigar acerca de modelos de lenguaje entrenados para generar texto en español.
+2. Seleccionar el tipo de texto específico sobre el cual el modelo realizará preguntas.
+3. Definir críterios de evaluación para las preguntas generadas por el modelo de acuerdo con el objetivo del proyecto.
+4. Detectar limitaciones del modelo elegido para la generación de preguntas en español.
+5. Aplicar *zero-shot prompting* y evaluar los resultados obtenidos.
+6. Aplicar *few shot prompting* y evaluar los resultados obtenidos.
+7. Elegir un conjunto de datos apropiado para realizar el *fine tuning* del modelo.
+8. Efectuar *fine tuning* sobre el modelo y buscar mejores resultados respecto al punto anterior.
+9. Determinar las mejoras obtenidas en cada enfoque y realizar conclusiones acerca de las mismas.
+
+A través de estos objetivos, logramos abordar las limitaciones detectadas del modelo y aplicar diferentes técnicas para mejorar la calidad de las preguntas generadas. Los resultados obtenidos mediante estas técnicas serán analizados con más detalle en las conclusiones del informe. 
 
 ## Técnicas relevantes
 
@@ -180,6 +181,25 @@ Unsloth es una herramienta que promete entrenar modelos extensos de lenguaje má
 
 Nuestra hipótesis sobre esta degradación se basa en la forma en la que Unsloth maneja los contextos a través de *RoPE Scaling* [^32]. Consideramos que, al procesar contextos de este tamaño, el modelo podría perder la capacidad de retener la instrucción solicitada, tendiendo en su lugar a realizar la instrucción más común asociada con dicha longitud de contexto.
 
+## Bases de código exploradas
+
+Dado a que era nuestra primera vez trabajando en un proyecto sobre el procesamiento de lenguaje natural, fue necesario explorar diferentes bases de código para aprender las técnicas más utilizadas, las diferentes partes en el desarrollo y para mantener nuestro código simple y fácil de leer pero modernizado, ya que varias de las librerias utilizadas en el proyecto se actualizan de forma regular.
+
+
+
+| Nombre                                                                                  | Repositorio                                                                                                      | Propósito                                                                          | Aspectos clave                                                                              | Motivo de análisis                                                                                                                              |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+|    🤗 **Tokenizers - Hugging Face**                                                                                       |                                                                                             [huggingface/tokenizers](https://github.com/huggingface/tokenizers)                     | Pre-procesameinto de datos, inferencia y entrenamiento.                                                                                    |     Buena documentación y muchos ejemplos.                                                                                        | Ofrece una implementación optimizada para la tokenización rápida y eficiente, compatible con los modelos del Hub. |
+| 🤗 **Datasets - Hugging Face**                                                          | [huggingface/datasets](https://github.com/huggingface/datasets)                                                  | Descarga y preprocesamiento de datos.                                              | Carga de conjunto de datos públicos de forma sencilla y pre-procesado eficiente.            | Ofrece código para descargar conjuntos de datos y diferentes configuraciones para hacerlo.                                                      |
+| 🤗 **TRL - Hugging Face**                                                               | [huggingface/trl](https://github.com/huggingface/trl)                                                            | *Fine tuning* usando aprendizaje supervisado.                                      | Soporte con PEFT, buena documentación, eficiencia y `Trainers`.                             | Brinda implementaciones de entrenamientos, ejemplos de formatos de conjunto de datos utilizados para entrenar y de configuración de parámetros. |
+| 🤗 **NLP Course - Hugging Face**                                                        | [huggingface/course](https://github.com/huggingface/course)                                                      | Inferencia de los distintos modelos probados y comprensión de conceptos claves.    | Aprendizaje guiado sobre el ecosistema de HuggingFace y conceptos clave de NLP.             | Instruirnos en el uso de `Transformers`, `Dataset` y `Tokenizers`.                                                                              |
+| 🤗 **Transformers - Hugging Face**                                                      | [huggingface/transformers](https://github.com/huggingface/transformers)                                          | Implementación de modelos LLM.                                                     | Compatibilidad con modelos Llama y comunidad activa.                                        | Base para hacer inferencia probando modelos mediante `pipeline`.                                                                                |
+| 📖 **LLM Course**                                                                       | [mlabonne/llm-course](https://github.com/mlabonne/llm-course)                                                    | *Fine tuning* y pre-procesamiento de datos.                                        | Explicaciones detalladas, entrenamiento ultra-eficiente y código fácil de leer.             | Aprender cómo entrenar el modelo de manera eficiente, usando técnicas de aprendizaje supervisado.                                               |
+| 🤗 **PEFT - Hugging Face**                                                              | [huggingface/peft](https://github.com/huggingface/peft)                                                          | *Fine-tuning* usando QLoRA y valor de parámetros para la aplicación de la técnica. | *Fine-tuning* eficiente y buena documentación.                                              | Ofrece explicación detallada acerca de los parámetros para aplicar QLoRA y código donde se aplica la técnica.                                   |
+| ⚡ **Making LLMs even more accessible with bitsandbytes, 4-bit quantization and QLoRA** | [colab/bnb-4bit-training](https://colab.research.google.com/drive/1VoYNfYDKcKRQRor98Zbf2-9VQTtGJ24k?usp=sharing) | *Fine tuning* de modelos mediante QLoRA y cuantización en NF4.                     | Uso del ecosistema de HuggingFace, *nested quantization*, NF4 y *Gradient checkpointing*.   | Ofrece una implementación optimizada usando QLoRA y es compatible con HuggingFace.                                                              |
+| 🦥 **Unsloth**                                                                          | [unslothai/unsloth](https://github.com/unslothai/unsloth)                                                        | Optimización para realizar inferencia y *fine tuning*.                             | Optimización de la memoria, compatibilidad con modelos Llama 3.1 y velocidad de inferencia. | Brinda código para entrenar y hacer inferencia de modelos de la familia Llama 3, usando la herramienta Unsloth en un entorno de HuggingFace.    |
+| 📚 **Wikipedia-API**                                                                    | [project/wikipedia-API](https://pypi.org/project/Wikipedia-API/)                                                 | Obtención de datos de Wikipedia para probar modelos.                               | Simpleza y facilidad para recuperar información de Wikipedia.                               | Ofrece código sobre el uso del *wrapper* mediante casos de uso.                                                                                 |
+
 ## Problemas encontrados
 
 En esta sección detallamos los principales desafíos que surgieron durante el desarrollo del proyecto y las estrategias implementadas para resolverlos.
@@ -235,7 +255,7 @@ Este error lleva tiempo ahí, inclusive un usuario solicitó un *pull request* c
 
 El tokenizador de la familia de modelos LLaMa, no poseen un `pad_token` definido, lo que es un problema para hacer inferencia, y también, para aplicar *fine tuning* sobre ellos. Hemos investigado mucho al respecto, y es un hecho, la falta de información oficial sobre este tema provoca una gran confusión entre los usuarios [^36][^37]. La solución que abordamos para este problema fue la que habitualmente se utiliza, definir el `pad_token` igual que el `eos_token` y mantener un tamaño de *batch* de 1 durante el entrenamiento para evitar problemas debido al token de relleno.
 
-### Fine tuning
+### Formato del conjunto de datos
 
 Adoptamos como primer enfoque implementar la técnica de *fine tuning* sobre 1000 preguntas repartidas en 840 contextos diferentes del conjunto de datos SQAC. No obstante, en el entrenamiento del modelo pudimos notar que algo andaba mal debido a que el *training loss* no disminuía, sino que oscilaba siempre entre los mismos valores, como se puede observar en el siguiente gráfico:
 
@@ -263,10 +283,45 @@ Con el cual, como podemos ver en la imagen a continuación obtuvimos una mayor d
 ###  Evaluación del progreso
 Hasta ahora se realizó una evaluación anecdótica manual comparando los diferentes resultados obtenidos al cambiar las entradas y las técnicas utilizadas. Se planea para un futuro investigar alternativas de evaluación.
 
+## Conclusiones
+En esta sección abordaremos diferentes conclusiones que pudimos obtener de realizar este proyecto.
+
+### Planificación inicial y ejecución efectiva
+
+Nuestra falta de experiencia en el procesamiento de lenguaje natural mediante modelos extensos de lenguaje causó la omisión involuntaria de aspectos importantes durante la etapa de planificación del proyecto, como la elección de un modelo apropiado, críterios de evaluación de los resultados obtenidos y hasta falta de precisión en los objetivos específicos. Todos estos detalles, obstaculizaron el progreso y nos obligaron a regresar a la etapa de planificación en diversas ocaciones a subsanar los errores cometidos.
+
+La impericia mencionada en el párrafo anterior ocacionó también una mala gestión del tiempo, donde tareas que pensábamos terminar rápidamente nos llevaron mucho más tiempo de lo estipulado. De esta manera, terminamos aplicando cada técnica planteada, con el fin de cumplir con todos los objetivos en el tiempo acordado, dejando en segundo plano la evaluación de las mejoras obtenidas, lo que produjo una falta de comprensión en los impactos de cada una.
+
+### Entorno de ejecución limitado
+
+Mencionamos en reiteradas ocaciones a lo largo de este informe que el entorno de ejecución sobre el cual estábamos trabajando poseía recursos limitados, forzándonos a tomar ciertas decisiones para seguir trabajando sobre él. Realmente, trabajar sobre este entorno fue una decisión, ya que no era el único que disponiamos, sino que también contábamos con acceso a una máquina del Centro de Computación de Alto Desempeño de la UNC (CCAD), con mejores especificaciones.
+
+Consideramos que esta decisión ocacionó que debamos invertir demasiado tiempo en investigar técnicas de optimización avanzadas, el cual  nos hubiésemos ahorrado eligiendo el otro entorno. Sin embargo, debemos mencionar que trabajar en un entorno limitado nos hizo descrubrir que este es un problema usual en esta área y nos dió a conocer técnicas que la comunidad emplea para solucionarlo.
+
+### Conclusiones sobre técnicas utilizadas
+
+Mediante la técnica *zero-shot* aplicada al modelo base `meta-llama/Llama-3.1-8B` obtuvimos preguntas las cuales, en su mayoria, ni siquiera cumplían con el  tipo especificado, incluso generaba preguntas repetidas, muy similares entre sí y hasta incluía respuestas. Además, era complicado indicarle al modelo el número de preguntas a generar, por lo que a veces generaba más o menos, dependiendo del parámetro de detención que le pasábamos. Sobre este mismo modelo, aplicamos *few-shot* con el fin de obtener preguntas que se adecuaran a los tipos especificados y lo conseguimos, pero seguíamos con las mismas deficiencias que la técnica anterior, entonces decidimos cambiar el modelo.
+
+Aplicando *system prompts* y *few shot* al modelo `meta-llama/Llama-3.1-8B` conseguímos mejorar notablemente la calidad de las preguntas generadas y era posible especificar, sin problemas, la cantidad de preguntas a generar, es más, podíamos pedir cuántas preguntas de cada tipo queríamos. El modelo, normalmente, generaba preguntas dentro de los tipos detallados, aunque, solía generar preguntas que tenían respuestas abiertas, no orientadas al refuerzo de la comprenión o incluyendo las respuestas. *Few-shot*, en este caso, lo aplicamos pasando otros artículos junto con preguntas de ejemplo que se podían realizar sobre los mismos antes de la instrucción en un formato de conversación. 
+
+Finalmente con *fine tuning* solucionamos el problema de preguntas que incluían respuestas, aunque invertimos bastante tiempo en elegir el conjunto de datos apropiado, pre-procesarlo y entrenar el modelo sobre él. El modelo resultante genera preguntas que cumplen con el tipo de respuesta corta, poseen  naturalidad, fluidez y cuya respuesta está presente en el texto proporcionado, todo esto debido a la naturaleza del conjunto de datos.
+
+Como conclusión de esta sección consideramos que para esta tarea, realizar *few-shot* con un *prompt* bien estructurado es más que suficiente. El modelo obtenido mediante *fine tuning* conlleva mucho esfuerzo pero sigue teniendo limitaciones importantes, por ejemplo al no tener preguntas de verdadero o falso en su conjunto de datos tiende a no generarlas.
+
+### Trabajo Futuro
+
+Si bien logramos mejorar la generación de preguntas mediante *fine tuning* y *few shot prompting*, quedan desafíos que abordar como la diversificación de resultados, ya que recordemos que lo trabajado en este proyecto fue enfocado solamente a biografías, nos gustaría poder ampliar este trabajo a otros tipos de texto. Asimismo, nos gustaría mejorar la evaluación las preguntas generadas y la exploración de otras limitaciones.
+
+
 ****************************************
 
-### Referencias
+### Bibliografía
 
+Medina, Julia A. (2024). *Exploración de técnicas de
+prompt-programming para sistemas
+de recomendación*. Universidad Nacional de Córdoba.
+
+### Referencias
 [^1]: https://urjconline.atavist.com/2023/06/29/pregunta-tipo-respuesta-corta/.
 [^2]: https://www.promptingguide.ai/techniques/zeroshot.
 [^3]: https://promptengineering.org/system-prompts-in-large-language-models.
