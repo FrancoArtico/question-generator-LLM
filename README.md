@@ -47,7 +47,7 @@ siendo `article[0]` y `article[1]` el primer y segundo párrafo respectivamente 
 
 ### Few-shot learning
 
-*Few-shot learining* es una técnica que consiste en pasarle al modelo, junto con la instrucción de la tarea, unos pocos ejemplos que sirvan como guía para aprender el patrón de los resultados que deseamos obtener [^4].
+*Few-shot learning* es una técnica que consiste en pasarle al modelo, junto con la instrucción de la tarea, unos pocos ejemplos que sirvan como guía para aprender el patrón de los resultados que deseamos obtener [^4].
 
 La idea de utilizar esta técnica en nuestro proyecto surge, principalmente, al darnos cuenta que los modelos naturalmente no generan preguntas de verdadero o falso. Entonces, necesitábamos proporcionarles ejemplos para incentivarlos a generarlas.
 
