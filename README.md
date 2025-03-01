@@ -366,17 +366,19 @@ En primera instancia, probamos el desempeño de diferentes modelos en la tarea d
     > 2. ¿Que edad tiene Bill Gates?.
 * *Naturalidad y fluidez:* las preguntas generadas deben evitar una estructura mecanizada, minimizando repeticiones innecesarias y mostrando una formulación de preguntas similiar a las realizadas por una persona.
     > ⛔ **Ejemplos de preguntas antinaturales:**
-            > ##### Errores en la formulación
+            > Con errores en la formulación:
             >  1. ¿Qué campo de estudio se le considera uno de los más importantes de todos los tiempos? (Corrección: ¿En qué --> ¿Qué).
             >  2.  ¿Qué universidad asistió Gödel a estudiar después de cumplir 18 años? (Corección: ¿A qué --> ¿Qué).
             >  3. ¿Qué fue el resultado de la investigación policial sobre la muerte de Alan Turing en 2012? (Corrección: ¿Qué --> ¿Cuál).
             >  4. ¿En qué universidad asistió Steve Jobs? (Corrección: ¿En qué --> ¿A qué)
-            >  ##### Falta de naturalidad:
+            > 
+            > Con falta de naturalidad:
             >  1. ¿En qué año Bill Gates abandonó la universidad para trasladarse a Albuquerque y pactar con MITS la cesión del 50% del lenguaje para computadoras Basic?  (posee una estructura mecanizada extraída del texto directamente).
             >  2.  ¿Fue John von Neumann un matemático húngaro-estadounidense que realizó contribuciones fundamentales en física cuántica, análisis funcional, teoría de conjuntos, teoría de juegos, ciencias de la computación, economía, análisis numérico, cibernética, hidrodinámica, estadística y muchos otros campos? (al igual que el primer ejemplo, una pregunta demasiado específica).
             >  3. ¿Verdadero o falso: La reina Isabel II le otorgó a Alan Turing un indulto póstumo en 2013? (no es una forma natural de preguntar acerca de verdaderos o falsos).
-            >  ##### Estructura mecanizada
-            >  7. ¿**Fue** el gobierno británico de David Cameron el que denegó el indulto a Alan Turing en 2012?
+            >   
+            > Con estructura mecanizada:
+            >  1. ¿**Fue** el gobierno británico de David Cameron el que denegó el indulto a Alan Turing en 2012?
     > 8. ¿**Fue** el premio Turing otorgado anualmente por la Association for Computing Machinery para personas destacadas por sus contribuciones técnicas al mundo de la informática?
     > 9. ¿**Fue** el Instituto Alan Turing inaugurado por el UMIST y la Universidad de Mánchester en el verano de 2004?
     > 10. ¿**Fue** la estatua de bronce de Alan Turing esculpida por John W. Mills en la Universidad de Surrey en 2004?
